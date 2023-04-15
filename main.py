@@ -11,7 +11,7 @@ async def on_ready(message):
 
 @client.event
   async def on_message(message):
-    # "message.flags.value >> 13" == True should be replacable with "message.flags.voice" when VM support comes to discord.py, I think.
+    # "message.flags.value >> 13 == True" should be replacable with "message.flags.voice" when VM support comes to discord.py, I think.
     if message.flags.value >> 13 == True and len(message.attachments) == 1:
       msg = await message.reply("✨ Transcribing...")
       
