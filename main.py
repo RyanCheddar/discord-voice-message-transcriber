@@ -5,6 +5,15 @@ import pydub
 import io
 from discord import app_commands
 
+# This controls if all voice messages should be transcribed automatically
+# Change False to True if you want this behavior, not recommended for public bots!
+transcribe_everything = False
+
+# Enter the User IDs of people who you want to have control over the bot's configs
+# Currently, these people just have the ability to sync the bot's command tree.
+bot_managers = [396545298069061642]
+
+
 
 intents = discord.Intents.default()
 intents.messages = True
