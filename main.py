@@ -22,7 +22,7 @@ client = discord.Client(command_prefix='!', intents=intents)
 tree = app_commands.CommandTree(client)
 
 @client.event
-async def on_ready(message):
+async def on_ready():
 	print("BOT READY!")
 
 async def transcribe_message(message):
