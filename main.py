@@ -5,39 +5,44 @@ import pydub
 import io
 from discord import app_commands
 
+
 client = discord.Client(command_prefix='!', intents=discord.Intents.messages)
 tree = app_commands.CommandTree(client)
 
+# This controls if all voice messages should be transcribed automatically
+# Change False to True if you want this behavior, not recommended for public bots!
+transcribe_everything = False
 
 @client.event
-async def on_ready():
-    print("BOT READY!")
+async def on_ready(message):
+	print("BOT READY!")
 
+async def transcribe_message(message):
+	msg = await message.reply("✨ Transcribing...", mention_author=False)
+	
+	# Read voice file and converts it into something pydub can work with
+	voice_file = await message.attachments[0].read()
+	voice_file = io.BytesIO(voice_file)
+	
+	# Convert original .ogg file into a .wav file
+	x = await client.loop.run_in_executor(None, pydub.AudioSegment.from_file, voice_file)
+	new = io.BytesIO()
+	await client.loop.run_in_executor(None, functools.partial(x.export, new, format='wav'))
+	
+	# Convert .wav file into speech_recognition's AudioFile format or whatever idrk
+	recognizer = speech_recognition.Recognizer()
+	with speech_recognition.AudioFile(new) as source:
+		audio = await client.loop.run_in_executor(None, recognizer.record, source)
+	
+	# Runs the file through OpenAI Whisper
+	result = await client.loop.run_in_executor(None, recognizer.recognize_whisper, audio)
+	await msg.edit(content="**Audio Message Transcription: ** ```" + result + "```")
 
 @client.event
 async def on_message(message):
-    # "message.flags.value >> 13" should be replaceable with "message.flags.voice" when VM support comes to
-    # discord.py, I think.
-    if message.flags.value >> 13 and len(message.attachments) == 1:
-        msg = await message.reply("✨ Transcribing...", mention_author=False)
-
-        # Read voice file and converts it into something pydub can work with
-        voice_file = await message.attachments[0].read()
-        voice_file = io.BytesIO(voice_file)
-
-        # Convert original .ogg file into a .wav file
-        x = await client.loop.run_in_executor(None, pydub.AudioSegment.from_file, voice_file)
-        new = io.BytesIO()
-        await client.loop.run_in_executor(None, functools.partial(x.export, new, format='wav'))
-
-        # Convert .wav file into speech_recognition's AudioFile format or whatever idrk
-        recognizer = speech_recognition.Recognizer()
-        with speech_recognition.AudioFile(new) as source:
-            audio = await client.loop.run_in_executor(None, recognizer.record, source)
-
-        # Runs the file through OpenAI Whisper
-        result = await client.loop.run_in_executor(None, recognizer.recognize_whisper, audio)
-        await msg.edit(content="**Audio Message Transcription: ** ```" + result + "```")
+	# "message.flags.value >> 13" should be replacable with "message.flags.voice" when VM support comes to discord.py, I think.
+	if transcribe_everything and message.flags.value >> 13 and len(message.attachments) == 1:
+		await transcribe_message(message)
 
 
 # create slash command
@@ -50,6 +55,5 @@ async def open_source(ctx):
         color=0x00ff00
     )
     await ctx.reply(embed=embed)
-
-
+	  
 client.run("BOT TOKEN HERE")
