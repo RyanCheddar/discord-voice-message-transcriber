@@ -1,4 +1,5 @@
-discord.py
-SpeechRecognition
-openai-whisper
-pydub
+discord.py==2.2.2
+SpeechRecognition==3.10.0
+openai-whisper==20230314
+pydub==0.25.1
+
