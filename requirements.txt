@@ -1,0 +1,4 @@
+discord.py
+SpeechRecognition
+openai-whisper
+pydub
