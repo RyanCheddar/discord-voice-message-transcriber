@@ -16,7 +16,6 @@ async def on_ready(message):
       msg = await message.reply("✨ Transcribing...")
       
       # Read voice file and converts it into a file-like object
-      recognizer = speech_recognition.Recognizer()
       voice_file = await message.attachments[0].read()
       voice_file = io.BytesIO(voice_file)
       
@@ -26,6 +25,7 @@ async def on_ready(message):
       await client.loop.run_in_executor(None, functools.partial(x.export, new, format='wav'))
       
       # Convert .wav file into speech_recognition's AudioFile format or whatever idrk
+      recognizer = speech_recognition.Recognizer()
       with speech_recognition.AudioFile(new) as source:
           audio = await client.loop.run_in_executor(None, recognizer.record, source)
       
