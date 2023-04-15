@@ -3,6 +3,7 @@ import asyncio
 import speech_recognition
 import functools
 
+
 client = discord.Client()
 
 @client.event
@@ -12,8 +13,8 @@ async def on_ready(message):
 @client.event
   async def on_message(message):
     # "message.flags.value >> 13 == True" should be replacable with "message.flags.voice" when VM support comes to discord.py, I think.
-    if message.flags.value >> 13 == True and len(message.attachments) == 1:
-      msg = await message.reply("✨ Transcribing...")
+    if message.flags.value >> 13 and len(message.attachments) == 1:
+      msg = await message.reply("✨ Transcribing...", mention_author=False)
       
       # Read voice file and converts it into a file-like object
       voice_file = await message.attachments[0].read()
