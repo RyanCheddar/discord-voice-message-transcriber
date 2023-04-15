@@ -21,10 +21,6 @@ intents.message_content = True
 client = discord.Client(command_prefix='!', intents=discord.Intents.messages())
 tree = app_commands.CommandTree(client)
 
-# This controls if all voice messages should be transcribed automatically
-# Change False to True if you want this behavior, not recommended for public bots!
-transcribe_everything = False
-
 @client.event
 async def on_ready(message):
 	print("BOT READY!")
