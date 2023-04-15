@@ -6,7 +6,10 @@ import io
 from discord import app_commands
 
 
-client = discord.Client(command_prefix='!', intents=discord.Intents.messages)
+intents = discord.Intents.default()
+intents.messages = True
+intents.message_content = True
+client = discord.Client(command_prefix='!', intents=discord.Intents.messages())
 tree = app_commands.CommandTree(client)
 
 # This controls if all voice messages should be transcribed automatically
