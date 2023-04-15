@@ -51,6 +51,8 @@ async def transcribe_message(message):
 	
 	# Runs the file through OpenAI Whisper
 	result = await client.loop.run_in_executor(None, recognizer.recognize_whisper, audio)
+	if result == "":
+		result = "*nothing*"
 	await msg.edit(content="**Audio Message Transcription:\n** ```" + result + "```")
 
 @client.event
