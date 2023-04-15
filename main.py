@@ -59,6 +59,11 @@ async def on_message(message):
 	if transcribe_everything and message.flags.value >> 13 and len(message.attachments) == 1:
 		await transcribe_message(message)
 
+	if message.content == "!synctree" and message.author.id in bot_managers:
+		await tree.sync(guild=None)
+		await message.reply("Synced!")
+		return
+
 
 # Slash Command / Context Menu Handlers
 @tree.command(name="opensource")
