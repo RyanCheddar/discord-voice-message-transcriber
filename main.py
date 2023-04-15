@@ -17,7 +17,7 @@ async def on_ready(message):
     if message.flags.value >> 13 and len(message.attachments) == 1:
       msg = await message.reply("✨ Transcribing...", mention_author=False)
       
-      # Read voice file and converts it into a file-like object
+      # Read voice file and converts it into something pydub can work with
       voice_file = await message.attachments[0].read()
       voice_file = io.BytesIO(voice_file)
       
