@@ -18,7 +18,7 @@ bot_managers = [396545298069061642]
 intents = discord.Intents.default()
 intents.messages = True
 intents.message_content = True
-client = discord.Client(command_prefix='!', intents=discord.Intents.messages())
+client = discord.Client(command_prefix='!', intents=intents)
 tree = app_commands.CommandTree(client)
 
 @client.event
