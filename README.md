@@ -7,7 +7,7 @@ Discord.py bot that transcribes voice messages using OpenAI Whisper
 
 To use the bot, you will need to install the needed dependencies (listed in requirements.txt). There are tutorials on how to use pip to do this online.
 
-You will also need a bot token (attainable at the [Discord Developer Portal](https://discord.com/developers/applications), which can be added at the bottom of main.py at the client.run spot. Make sure your bot has the Message Content intent, or it won't be able to read any voice messages.
+You will also need a bot token (acquirable at the [Discord Developer Portal](https://discord.com/developers/applications)), which can be added at the bottom of main.py at the client.run spot. Make sure your bot has the Message Content intent, or it won't be able to read any voice messages.
 
 Finally, at the top of main.py, you can change some settings that alter how the bot works. You will also need to add your User ID in the bot_managers variable, just so you can control the bot via commands later.
 
