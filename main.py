@@ -85,9 +85,9 @@ async def synctree(interaction: discord.Interaction):
 	await tree.sync(guild=None)
 	await interaction.response.send_message(content="Synced!")
     
-@tree.context_menu(name="Transcribe Voice Message")
-@tree.describe()
+@tree.context_menu(name="Transcribe VM")
 async def transcribe_contextmenu(interaction: discord.Interaction, message: discord.Message):
+    await interaction.response.send_message(content="Transcription started!", ephemeral=True)
     await transcribe_message(message)
 	  
 client.run("BOT TOKEN HERE")
