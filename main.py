@@ -57,15 +57,28 @@ async def on_message(message):
 		await transcribe_message(message)
 
 
-# create slash command
+# Slash Command / Context Menu Handlers
 @tree.command(name="opensource")
 async def open_source(ctx):
-    embed = discord.Embed(
-        title="Open Source",
-        description="This bot is open source! You can find the source code "
+	embed = discord.Embed(
+    	title="Open Source",
+    	description="This bot is open source! You can find the source code "
                     "[here](https://https://github.com/RyanCheddar/discord-voice-message-transcriber)",
-        color=0x00ff00
-    )
-    await ctx.reply(embed=embed)
+    	color=0x00ff00
+	)
+	await ctx.reply(embed=embed)
+    
+@tree.command(name="synctree")
+async def synctree(ctx):
+	if ctx.author.id not in bot_managers:
+		return
+
+	await client.tree.sync(guild=None)
+	await ctx.reply("Synced!")
+    
+@tree.context_menu(name="Transcribe Voice Message")
+@tree.describe()
+async def transcribe_contextmenu(interaction: discord.Interaction, message: discord.Message):
+    await transcribe_message(message)
 	  
 client.run("BOT TOKEN HERE")
