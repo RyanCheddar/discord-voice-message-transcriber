@@ -2,6 +2,7 @@ import discord
 import asyncio
 import speech_recognition
 import functools
+import pydub
 
 
 client = discord.Client()
