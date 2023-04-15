@@ -26,6 +26,13 @@ async def on_ready():
 	print("BOT READY!")
 
 async def transcribe_message(message):
+	if len(message.attachments) == 0:
+		await message.reply("Transcription failed! (No Voice Message)", mention_author=False)
+		return
+	if message.attachments[0].content_type != "audio/ogg":
+		await message.reply("Transcription failed! (Attachment not a Voice Message)", mention_author=False)
+		return
+	
 	msg = await message.reply("✨ Transcribing...", mention_author=False)
 	
 	# Read voice file and converts it into something pydub can work with
