@@ -15,18 +15,22 @@ async def on_ready(message):
     if message.flags.value >> 13 == True and len(message.attachments) == 1:
       msg = await message.reply("✨ Transcribing...")
       
+      # Read voice file and converts it into a file-like object
       recognizer = speech_recognition.Recognizer()
       voice_file = await message.attachments[0].read()
       voice_file = io.BytesIO(voice_file)
       
+      # Convert original .ogg file into a .wav file
       x = await client.loop.run_in_executor(None, pydub.AudioSegment.from_file, voice_file)
-      
       new = io.BytesIO()
       await client.loop.run_in_executor(None, functools.partial(x.export, new, format='wav'))
       
+      # Convert .wav file into speech_recognition's AudioFile format or whatever idrk
       with speech_recognition.AudioFile(new) as source:
           audio = await client.loop.run_in_executor(None, r.record, source)
-
-      await msg.edit(content="**Audio Message Transcription: ** ```" + (await client.loop.run_in_executor(None, r.recognize_whisper, audio)) + "```")
+      
+      # Runs the file through OpenAI Whisper
+      result = await client.loop.run_in_executor(None, r.recognize_whisper, audio)
+      await msg.edit(content="**Audio Message Transcription: ** ```" + result + "```")
       
 client.run("BOT TOKEN HERE")
