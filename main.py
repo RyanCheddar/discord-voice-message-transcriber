@@ -27,10 +27,10 @@ async def on_ready(message):
       
       # Convert .wav file into speech_recognition's AudioFile format or whatever idrk
       with speech_recognition.AudioFile(new) as source:
-          audio = await client.loop.run_in_executor(None, r.record, source)
+          audio = await client.loop.run_in_executor(None, recognizer.record, source)
       
       # Runs the file through OpenAI Whisper
-      result = await client.loop.run_in_executor(None, r.recognize_whisper, audio)
+      result = await client.loop.run_in_executor(None, recognizer.recognize_whisper, audio)
       await msg.edit(content="**Audio Message Transcription: ** ```" + result + "```")
       
 client.run("BOT TOKEN HERE")
