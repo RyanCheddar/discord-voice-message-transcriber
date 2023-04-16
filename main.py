@@ -13,8 +13,8 @@ transcribe_everything = False
 # Currently, these people just have the ability to sync the bot's command tree.
 bot_managers = [396545298069061642]
 
-# Bot admin role ID goes here
-adminRole = 0
+# Alternatively, you can also give an entire role control over the bot by putting its Role ID here.
+admin_role = None
 
 intents = discord.Intents.default()
 intents.messages = True
@@ -58,26 +58,22 @@ async def transcribe_message(message):
 	await msg.edit(content="**Audio Message Transcription:\n** ```" + result + "```")
 
 
-async def is_admin(input: discord.Interaction or discord.message) -> bool:
+def is_manager(input: discord.Interaction or discord.message) -> bool:
 	if type(input) is discord.Interaction:
 		user = input.user
 	else:
 		user = input.author
-
-	admin = input.guild.get_role(adminRole)
-
-	if admin is None:
-		if type(input) is discord.Interaction:
-			await input.response.send_message(content="No admin role assigned, please update the variable with the proper ID")
-		else:
-			await input.reply("No admin role assigned, please update the variable with the proper ID")
-
-		return False
-
-	if user in admin.members:
+	
+	if user.id in bot_managers:
 		return True
-	else:
-		return False
+	
+	if admin_role != None:
+		admin = input.guild.get_role(admin_role)
+
+		if user in admin.members:
+			return True
+
+	return False
 
 
 @client.event
@@ -86,7 +82,7 @@ async def on_message(message):
 	if transcribe_everything and message.flags.value >> 13 and len(message.attachments) == 1:
 		await transcribe_message(message)
 
-	if message.content == "!synctree" and await is_admin(message):
+	if message.content == "!synctree" and is_manager(message):
 		await tree.sync(guild=None)
 		await message.reply("Synced!")
 		return
@@ -105,7 +101,7 @@ async def open_source(interaction: discord.Interaction):
     
 @tree.command(name="synctree", description="Syncs the bot's command tree.")
 async def synctree(interaction: discord.Interaction):
-	if not await is_admin(interaction):
+	if not is_manager(interaction):
 		await interaction.response.send_message(content="You are not a Bot Manager!")
 		return
 
