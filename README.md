@@ -5,7 +5,9 @@ Discord.py bot that transcribes voice messages using OpenAI Whisper
 
 # Get Started
 
-To use the bot, you will need to install the needed dependencies (listed in requirements.txt). There are tutorials on how to use pip to do this online.
+To use the bot, you will first need to install [Python](https://python.org). Python 3.10 is recommended as it's the easiest to set up. 3.11 also works and can provide some speedup, but you will need to install a pre-release version of numba using `pip install --pre numba`.
+
+You will need to install the needed dependencies (listed in requirements.txt). Generally, you just need to run `pip install [dependency1] [dependency2]...`.
 
 You will also need a bot token (acquirable at the [Discord Developer Portal](https://discord.com/developers/applications)), which can be added at the bottom of main.py at the client.run spot. Make sure your bot has the Message Content intent, or it won't be able to read any voice messages. If you inputted a role in the admin_role setting, you will also need the Server Members intent.
 
