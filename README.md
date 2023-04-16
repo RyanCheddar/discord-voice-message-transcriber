@@ -5,7 +5,7 @@ Discord.py bot that transcribes voice messages using OpenAI Whisper
 
 # Get Started
 
-To use the bot, you will first need to install [Python](https://python.org). Python 3.10 is recommended as it's the easiest to set up. 3.11 also works and can provide some speedup, but you will need to install a pre-release version of numba using `pip install --pre numba`.
+To use the bot, you will first need to install [Python](https://python.org). Python 3.10 is recommended as it's the easiest to set up. 3.11 also works and can provide some speedup, but you may need to install a pre-release version of numba using `pip install --pre numba`.
 
 You can install the needed dependencies by doing `pip install -r requirements.txt`.
 
