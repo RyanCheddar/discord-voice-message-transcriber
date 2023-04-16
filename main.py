@@ -35,32 +35,44 @@ except (configparser.NoOptionError, ValueError):
 intents = discord.Intents.default()
 intents.messages = True
 intents.message_content = True
-intents.members = ADMIN_ROLE != 0
+intents.members = True  # Change to False if not using the "ADMIN_ROLE" variable
+
+# Create a new client and specify intents
 client = discord.Client(command_prefix='!', intents=intents)
+
+# Define the CommandTree instance for registering commands
 tree = app_commands.CommandTree(client)
+
+# Create a new SlashCommand instance
+# slash = SlashCommand(client, sync_commands=True)
 
 @client.event
 async def on_ready():
 	print("BOT READY!")
+	await client.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name='listening to your voice messages'))
 
 async def transcribe_message(message):
-	if len(message.attachments) == 0:
+	if len(message.attachments) == 0 or message.attachments[0].content_type != "audio/ogg":
 		await message.reply("Transcription failed! (No Voice Message)", mention_author=False)
-		return
-	if TRANSCRIBE_VMS_ONLY and message.attachments[0].content_type != "audio/ogg":
-		await message.reply("Transcription failed! (Attachment not a Voice Message)", mention_author=False)
 		return
 	
 	msg = await message.reply("✨ Transcribing...", mention_author=False)
 	
 	# Read voice file and converts it into something pydub can work with
-	voice_file = await message.attachments[0].read()
-	voice_file = io.BytesIO(voice_file)
+	voice_file = io.BytesIO(await message.attachments[0].read())
+
 	
 	# Convert original .ogg file into a .wav file
 	x = await client.loop.run_in_executor(None, pydub.AudioSegment.from_file, voice_file)
 	new = io.BytesIO()
 	await client.loop.run_in_executor(None, functools.partial(x.export, new, format='wav'))
+
+	""" 
+	audio_segment = await client.loop.run_in_executor(None, pydub.AudioSegment.from_file, voice_file, format="ogg")
+	wav_bytes = io.BytesIO()
+	export_func = lambda: audio_segment.export(wav_bytes, format='wav')
+	await client.loop.run_in_executor(None, export_func)
+ 	"""
 	
 	# Convert .wav file into speech_recognition's AudioFile format or whatever idrk
 	recognizer = speech_recognition.Recognizer()
@@ -71,9 +83,17 @@ async def transcribe_message(message):
 	result = await client.loop.run_in_executor(None, recognizer.recognize_whisper, audio)
 	if result == "":
 		result = "*nothing*"
+		
 	# Send results + truncate in case the transcript is longer than 1900 characters
-	await msg.edit(content="**Audio Message Transcription:\n** ```" + result[:1900] + ("..." if len(result) > 1900 else "") + "```")
-
+	if len(result) <= 1900:
+		content = "✨**Audio Message Transcription:\n** ```" + result + "```"
+   		await msg.edit(content=content)
+	else:
+		content = "✨**Audio Message Transcription (1 of 2):\n** ```" + result[:1900] + "...```"
+    		await msg.edit(content=content)
+		
+		content = "✨**Audio Message Transcription (2 of 2):\n** ```" + result[1900:] + "```"
+   		await message.channel.send(content)
 
 def is_manager(input: discord.Interaction or discord.message) -> bool:
 	if type(input) is discord.Interaction:
