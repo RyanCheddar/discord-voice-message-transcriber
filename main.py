@@ -14,12 +14,13 @@ transcribe_everything = False
 bot_managers = [396545298069061642]
 
 # Alternatively, you can also give an entire role control over the bot by putting its Role ID here.
+# If you do put a Role ID here, you will also need to enable the Server Members intent.
 admin_role = None
 
 intents = discord.Intents.default()
 intents.messages = True
 intents.message_content = True
-intents.members = True
+intents.members = admin_role != None
 client = discord.Client(command_prefix='!', intents=intents)
 tree = app_commands.CommandTree(client)
 
