@@ -86,14 +86,15 @@ async def transcribe_message(message):
 		
 	# Send results + truncate in case the transcript is longer than 1900 characters
 	if len(result) <= 1900:
-		content = "✨**Audio Message Transcription:\n** ```" + result + "```"
+		content = "✨**Voice Message Transcription:\n** ```" + result + "```"
    		await msg.edit(content=content)
 	else:
-		content = "✨**Audio Message Transcription (1 of 2):\n** ```" + result[:1900] + "...```"
+		content = "✨**Voice Message Transcription (1 of 2):\n** ```" + result[:1900] + "...```"
     		await msg.edit(content=content)
 		
-		content = "✨**Audio Message Transcription (2 of 2):\n** ```" + result[1900:] + "```"
+		content = "✨**Voice Message Transcription (2 of 2):\n** ```" + result[1900:] + "```"
    		await message.channel.send(content)
+		# await message.send(content) i dont know discord.py
 
 def is_manager(input: discord.Interaction or discord.message) -> bool:
 	if type(input) is discord.Interaction:
