@@ -5,6 +5,13 @@ import pydub
 import io
 from discord import app_commands
 
+
+from dotenv import load_dotenv
+import os
+
+load_dotenv(".env")
+BOT_TOKEN = os.getenv("BOT_TOKEN")
+
 # This controls if all voice messages should be transcribed automatically
 # Change False to True if you want this behavior, not recommended for public bots!
 transcribe_everything = False
@@ -113,5 +120,7 @@ async def synctree(interaction: discord.Interaction):
 async def transcribe_contextmenu(interaction: discord.Interaction, message: discord.Message):
     await interaction.response.send_message(content="Transcription started!", ephemeral=True)
     await transcribe_message(message)
-	  
-client.run("BOT TOKEN HERE")
+
+
+if __name__ == "__main__":
+	client.run(BOT_TOKEN)
