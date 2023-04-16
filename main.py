@@ -19,15 +19,17 @@ config = configparser.ConfigParser()
 config.read("config.ini")
 
 if "transcribe" not in config and "admins" not in config:
-	print("Something is wrong with your config file.")
+	print("Something is wrong with your config.ini file.")
 	sys.exit(1)
 
 try:
-	TRANSCRIBE_EVERYTHING = config.getboolean("transcribe", "everything")
+	TRANSCRIBE_AUTOMATICALLY = config.getboolean("transcribe", "automatically")
+	TRANSCRIBE_VMS_ONLY = config.getboolean("transcribe", "voice_messages_only")
 	ADMIN_USERS = [int(i) for i in re.split(", |,", config["admins"]["users"])]
 	ADMIN_ROLE = config.getint("admins", "role")
+
 except (configparser.NoOptionError, ValueError):
-	print("Something is wrong with your config file.")
+	print("Something is wrong with your config.ini file.")
 	sys.exit(1)
 
 intents = discord.Intents.default()
@@ -45,7 +47,7 @@ async def transcribe_message(message):
 	if len(message.attachments) == 0:
 		await message.reply("Transcription failed! (No Voice Message)", mention_author=False)
 		return
-	if message.attachments[0].content_type != "audio/ogg":
+	if TRANSCRIBE_VMS_ONLY and message.attachments[0].content_type != "audio/ogg":
 		await message.reply("Transcription failed! (Attachment not a Voice Message)", mention_author=False)
 		return
 	
@@ -94,7 +96,7 @@ def is_manager(input: discord.Interaction or discord.message) -> bool:
 @client.event
 async def on_message(message):
 	# "message.flags.value >> 13" should be replacable with "message.flags.voice" when VM support comes to discord.py, I think.
-	if TRANSCRIBE_EVERYTHING and message.flags.value >> 13 and len(message.attachments) == 1:
+	if TRANSCRIBE_AUTOMATICALLY and message.flags.value >> 13 and len(message.attachments) == 1:
 		await transcribe_message(message)
 
 	if message.content == "!synctree" and is_manager(message):
