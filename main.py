@@ -1,15 +1,16 @@
-import discord
-import speech_recognition
-import functools
-import pydub
 import io
-from discord import app_commands
-
-import configparser
-from dotenv import load_dotenv
-import sys
 import os
 import re
+import sys
+import functools
+import configparser
+
+import discord
+import speech_recognition
+import pydub
+from discord import app_commands
+
+from dotenv import load_dotenv
 
 load_dotenv(".env")
 BOT_TOKEN = os.getenv("BOT_TOKEN")
