@@ -5,22 +5,34 @@ import pydub
 import io
 from discord import app_commands
 
-# This controls if all voice messages should be transcribed automatically
-# Change False to True if you want this behavior, not recommended for public bots!
-transcribe_everything = False
+import configparser
+from dotenv import load_dotenv
+import sys
+import os
+import re
 
-# Enter the User IDs of people who you want to have control over the bot's configs
-# Currently, these people just have the ability to sync the bot's command tree.
-bot_managers = [396545298069061642]
+load_dotenv(".env")
+BOT_TOKEN = os.getenv("BOT_TOKEN")
 
-# Alternatively, you can also give an entire role control over the bot by putting its Role ID here.
-# If you do put a Role ID here, you will also need to enable the Server Members intent.
-admin_role = None
+config = configparser.ConfigParser()
+config.read("config.ini")
+
+if "transcribe" not in config and "admins" not in config:
+	print("Something is wrong with your config file.")
+	sys.exit(1)
+
+try:
+	TRANSCRIBE_EVERYTHING = config.getboolean("transcribe", "everything")
+	ADMIN_USERS = [int(i) for i in re.split(", |,", config["admins"]["users"])]
+	ADMIN_ROLE = config.getint("admins", "role")
+except (configparser.NoOptionError, ValueError):
+	print("Something is wrong with your config file.")
+	sys.exit(1)
 
 intents = discord.Intents.default()
 intents.messages = True
 intents.message_content = True
-intents.members = admin_role != None
+intents.members = ADMIN_ROLE != 0
 client = discord.Client(command_prefix='!', intents=intents)
 tree = app_commands.CommandTree(client)
 
@@ -65,11 +77,11 @@ def is_manager(input: discord.Interaction or discord.message) -> bool:
 	else:
 		user = input.author
 	
-	if user.id in bot_managers:
+	if user.id in ADMIN_USERS:
 		return True
 	
-	if admin_role != None:
-		admin = input.guild.get_role(admin_role)
+	if ADMIN_ROLE != 0:
+		admin = input.guild.get_role(ADMIN_ROLE)
 
 		if user in admin.members:
 			return True
@@ -80,11 +92,11 @@ def is_manager(input: discord.Interaction or discord.message) -> bool:
 @client.event
 async def on_message(message):
 	# "message.flags.value >> 13" should be replacable with "message.flags.voice" when VM support comes to discord.py, I think.
-	if transcribe_everything and message.flags.value >> 13 and len(message.attachments) == 1:
+	if TRANSCRIBE_EVERYTHING and message.flags.value >> 13 and len(message.attachments) == 1:
 		await transcribe_message(message)
 
 	if message.content == "!synctree" and is_manager(message):
-		await tree.sync(guild=None)
+		await tree.sync(guild=message.guild)
 		await message.reply("Synced!")
 		return
 
@@ -111,7 +123,9 @@ async def synctree(interaction: discord.Interaction):
     
 @tree.context_menu(name="Transcribe VM")
 async def transcribe_contextmenu(interaction: discord.Interaction, message: discord.Message):
-    await interaction.response.send_message(content="Transcription started!", ephemeral=True)
-    await transcribe_message(message)
-	  
-client.run("BOT TOKEN HERE")
+	await interaction.response.send_message(content="Transcription started!", ephemeral=True)
+	await transcribe_message(message)
+
+
+if __name__ == "__main__":
+	client.run(BOT_TOKEN)
