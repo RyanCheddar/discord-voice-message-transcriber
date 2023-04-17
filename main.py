@@ -41,6 +41,8 @@ intents.members = ADMIN_ROLE != 0
 client = discord.Client(command_prefix='!', intents=intents)
 tree = app_commands.CommandTree(client)
 
+previous_transcriptions = {}
+
 @client.event
 async def on_ready():
 	print("BOT READY!")
@@ -54,6 +56,7 @@ async def transcribe_message(message):
 		return
 	
 	msg = await message.reply("✨ Transcribing...", mention_author=False)
+	previous_transcriptions[message.id] = msg.jump_url
 	
 	# Read voice file and converts it into something pydub can work with
 	voice_file = await message.attachments[0].read()
@@ -77,7 +80,7 @@ async def transcribe_message(message):
 			await msg.edit("Transcription failed! (Configured to use Whisper API, but no API Key provided!)")
 			return
 		result = await client.loop.run_in_executor(None, functools.partial(recognizer.recognize_whisper_api, audio, api_key=TRANSCRIBE_APIKEY))
-		
+
 	if result == "":
 		result = "*nothing*"
 	# Send results + truncate in case the transcript is longer than 1900 characters
@@ -136,6 +139,9 @@ async def synctree(interaction: discord.Interaction):
     
 @tree.context_menu(name="Transcribe VM")
 async def transcribe_contextmenu(interaction: discord.Interaction, message: discord.Message):
+	if message.id in previous_transcriptions:
+		await interaction.response.send_message(content=previous_transcriptions[message.id], ephemeral=True)
+		return
 	await interaction.response.send_message(content="Transcription started!", ephemeral=True)
 	await transcribe_message(message)
 
