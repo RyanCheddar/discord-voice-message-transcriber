@@ -23,6 +23,8 @@ if "transcribe" not in config and "admins" not in config:
 	sys.exit(1)
 
 try:
+	TRANSCRIBE_ENGINE = config["transcribe"]["engine"]
+	TRANSCRIBE_APIKEY = config["transcribe"]["apikey"]
 	TRANSCRIBE_AUTOMATICALLY = config.getboolean("transcribe", "automatically")
 	TRANSCRIBE_VMS_ONLY = config.getboolean("transcribe", "voice_messages_only")
 	ADMIN_USERS = [int(i) for i in re.split(", |,", config["admins"]["users"])]
@@ -67,8 +69,15 @@ async def transcribe_message(message):
 	with speech_recognition.AudioFile(new) as source:
 		audio = await client.loop.run_in_executor(None, recognizer.record, source)
 	
-	# Runs the file through OpenAI Whisper
-	result = await client.loop.run_in_executor(None, recognizer.recognize_whisper, audio)
+	# Runs the file through OpenAI Whisper (or API, if configured in config.ini)
+	if TRANSCRIBE_ENGINE == "whisper":
+		result = await client.loop.run_in_executor(None, recognizer.recognize_whisper, audio)
+	elif TRANSCRIBE_ENGINE == "api":
+		if TRANSCRIBE_APIKEY == "0":
+			await msg.edit("Transcription failed! (Configured to use Whisper API, but no API Key provided!)")
+			return
+		result = await client.loop.run_in_executor(None, functools.partial(recognizer.recognize_whisper_api, audio, api_key=TRANSCRIBE_APIKEY))
+		
 	if result == "":
 		result = "*nothing*"
 	# Send results + truncate in case the transcript is longer than 1900 characters
