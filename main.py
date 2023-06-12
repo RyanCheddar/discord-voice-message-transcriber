@@ -107,8 +107,7 @@ def is_manager(input: discord.Interaction or discord.message) -> bool:
 
 @client.event
 async def on_message(message):
-	# "message.flags.value >> 13" should be replacable with "message.flags.voice" when VM support comes to discord.py, I think.
-	if TRANSCRIBE_AUTOMATICALLY and message.flags.value >> 13 and len(message.attachments) == 1:
+	if TRANSCRIBE_AUTOMATICALLY and message.flags.voice and len(message.attachments) == 1:
 		await transcribe_message(message)
 
 	if message.content == "!synctree" and is_manager(message):
