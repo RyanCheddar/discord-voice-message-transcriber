@@ -13,26 +13,14 @@ from discord import app_commands
 from dotenv import load_dotenv
 
 load_dotenv(".env")
+
 BOT_TOKEN = os.getenv("BOT_TOKEN")
-
-config = configparser.ConfigParser()
-config.read("config.ini")
-
-if "transcribe" not in config and "admins" not in config:
-	print("Something is wrong with your config.ini file.")
-	sys.exit(1)
-
-try:
-	TRANSCRIBE_ENGINE = config["transcribe"]["engine"]
-	TRANSCRIBE_APIKEY = config["transcribe"]["apikey"]
-	TRANSCRIBE_AUTOMATICALLY = config.getboolean("transcribe", "automatically")
-	TRANSCRIBE_VMS_ONLY = config.getboolean("transcribe", "voice_messages_only")
-	ADMIN_USERS = [int(i) for i in re.split(", |,", config["admins"]["users"])]
-	ADMIN_ROLE = config.getint("admins", "role")
-
-except (configparser.NoOptionError, ValueError):
-	print("Something is wrong with your config.ini file.")
-	sys.exit(1)
+TRANSCRIBE_ENGINE = os.getenv("TRANSCRIBE_ENGINE")
+TRANSCRIBE_APIKEY = os.getenv("TRANSCRIBE_APIKEY")
+TRANSCRIBE_AUTOMATICALLY = os.getenv("TRANSCRIBE_AUTOMATICALLY")
+TRANSCRIBE_VMS_ONLY = os.getenv("TRANSCRIBE_VMS_ONLY")
+ADMIN_USERS = [int(i) for i in re.split(", |,", os.getenv("ADMIN_USERS"))]
+ADMIN_ROLE = os.getenv("ADMIN_ROLE")
 
 intents = discord.Intents.default()
 intents.messages = True
