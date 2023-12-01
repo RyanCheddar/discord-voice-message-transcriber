@@ -15,6 +15,34 @@ Finally, in the config.ini file, you can change some settings that alter how the
 
 Once you have successfully started the bot, send "!synctree" in a channel the bot can see in order to get context menu functionality + slash commands working.
 
+# Docker
+
+Build an image with `docker build -t discord-voice-message-transcriber .` (run from repository folder).
+It builds and runs well on both arm64 (m1 tested) and amd64 platforms without additional flags.
+
+Run it with 
+```
+docker run -it \
+-e BOT_TOKEN="..." \
+-e ADMIN_USERS="..." \
+-e TRANSCRIBE_ENGINE="..." \
+-e TRANSCRIBE_APIKEY="..." \
+-e TRANSCRIBE_AUTOMATICALLY="..." \
+-e TRANSCRIBE_VMS_ONLY="..." \
+-e ADMIN_USERS="..." \
+-e ADMIN_ROLE="..." \
+discord-voice-message-transcriber
+```
+
+Only `BOT_TOKEN` variable is required, also I recommend to specify either `ADMIN_USERS` or `ADMIN_ROLE` to be able to control bot.
+So fast start will be look like:
+
+```
+docker run -it \
+-e BOT_TOKEN="token" \
+discord-voice-message-transcriber
+```
+
 # Contribute & Other Stuff
 
 Sorry for the spaghetti code, I frankly have no idea how to do voice recognition efficiently.
